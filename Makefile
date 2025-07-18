@@ -1,11 +1,7 @@
-up:
-	docker-compose up --build -d
+docker-up:
+	docker-compose up --build
 
-down:
+docker-down:
 	docker-compose down
 
-shell:
-	docker exec -it go1.23 bash
-
-logs:
-	docker-compose logs -f
+	

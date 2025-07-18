@@ -4,8 +4,9 @@ services:
   golang-dev:
     build: .
     container_name: go1.23
+    working_dir: /app
+    ports:
+      - "8080:8080"
     volumes:
       - .:/app
-      - ~/.ssh:/root/.ssh:ro   # Compartilha suas chaves SSH
-      - ~/.gitconfig:/root/.gitconfig:ro  # Se quiser usar config local do host
     tty: true
