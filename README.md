@@ -56,9 +56,6 @@ http://localhost:8080/
 make docker-down
 ```
 
-
-## Tests
-
 ## Tests
 
 It's never too early to begin running unit tests. You can learn how to implement tests using Go's built-in testing framework on [Go Testing](https://pkg.go.dev/testing).

@@ -64,6 +64,20 @@ func setupRouter() *gin.Engine {
 		}
 	})
 
+	/*
+		Gin templates
+		To load templates, you can use LoadHTMLFiles or LoadHTMLGlob.
+		LoadHTMLFiles loads the specified files, while LoadHTMLGlob loads all files matching the specified pattern.
+		For example, to load all templates in the "templates" directory, you can use LoadHTMLGlob like this:
+		router.LoadHTMLFiles("templates/template1.html", "templates/template2.html")
+	*/
+	r.LoadHTMLGlob("templates/*")
+	r.GET("/index", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "base", gin.H{
+			"title": "Home",
+		})
+	})
+
 	return r
 }
 

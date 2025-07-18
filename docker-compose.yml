@@ -3,7 +3,7 @@ version: '3.8'
 services:
   golang-dev:
     build: .
-    container_name: go1.23
+    container_name: gin-framework-example
     working_dir: /app
     ports:
       - "8080:8080"
