@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  golang-dev:
+    build: .
+    container_name: go1.23
+    volumes:
+      - .:/app
+      - ~/.ssh:/root/.ssh:ro   # Compartilha suas chaves SSH
+      - ~/.gitconfig:/root/.gitconfig:ro  # Se quiser usar config local do host
+    tty: true
