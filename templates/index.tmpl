@@ -73,19 +73,19 @@
   <section class="hero">
     <h1>Encontre seu próximo livro favorito</h1>
     <p>Milhares de títulos com entrega rápida</p>
-<sl-button
-  variant="success"
-  size="large"
-  hx-ext="hyperscript"
-  _="on click 
-      if #featured-title.style.display == 'none'
-        set #featured-title.style.display to 'block'
-        then set  #book-list.style.display to ''
-      else
-        set #featured-title.style.display to 'none' 
-        then set #book-list.style.display to 'none'">
-  Ver Catálogo
-</sl-button>
+    <sl-button
+      variant="success"
+      size="large"
+      hx-ext="hyperscript"
+      _="on click 
+          if #featured-title.style.display == 'none'
+            set #featured-title.style.display to 'block'
+            then set  #book-list.style.display to ''
+          else
+            set #featured-title.style.display to 'none' 
+            then set #book-list.style.display to 'none'">
+      Ver Catálogo
+    </sl-button>
 
     <h2  id="featured-title" style="display: none;">Books on Sale</h2>
   </section>
