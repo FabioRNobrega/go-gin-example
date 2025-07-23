@@ -1,5 +1,5 @@
 behavior Removable
-    on click
-      remove me
-    end
+  on click
+    remove me
   end
+end
