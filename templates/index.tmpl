@@ -12,6 +12,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.0/htmx.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/htmx-ext-sse@2.2.3/sse.min.js"></script>
 
+  <!-- HyperScript -->
+  
+  <script type="text/hyperscript" src="/static/hs/removable._hs"></script>
+  <script type="text/hyperscript" src="/static/hs/uploader._hs"></script>
+  <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+
   <!-- Shoelace -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.19.1/cdn/themes/light.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.19.1/cdn/themes/dark.css" />
@@ -58,16 +64,33 @@
 
   <header>
     <strong>📚 BookStore</strong>
-    <sl-button variant="primary">Entrar</sl-button>
+    <sl-button variant="primary"  hx-on:click="alert('You clicked me!')">Entrar</sl-button>
+
+  
+
   </header>
 
   <section class="hero">
     <h1>Encontre seu próximo livro favorito</h1>
     <p>Milhares de títulos com entrega rápida</p>
-    <sl-button variant="success" size="large">Ver Catálogo</sl-button>
+<sl-button
+  variant="success"
+  size="large"
+  hx-ext="hyperscript"
+  _="on click 
+      if #featured-title.style.display == 'none'
+        set #featured-title.style.display to 'block'
+        then set  #book-list.style.display to ''
+      else
+        set #featured-title.style.display to 'none' 
+        then set #book-list.style.display to 'none'">
+  Ver Catálogo
+</sl-button>
+
+    <h2  id="featured-title" style="display: none;">Books on Sale</h2>
   </section>
 
-  <section class="book-list">
+  <section id="book-list" class="book-list">
     {{ range .Books }}
       <sl-card>
         <img slot="image" src="{{ .ImageURL }}" alt="Capa do livro {{ .Title }}" style="width: 100%; height: 200px; object-fit: cover;" />
@@ -80,11 +103,25 @@
     {{ end }}
   </section>
 
+  <section class="hero">
+   <div script="install Removable">
+      Click to get rid of me
+    </div>
+  </section>
+
+  <section class="hero">
+   <div script="install Uploader()">
+      Click to get rid of me
+    </div>
+  </section>
+
   <footer>
     © 2025 BookStore. Todos os direitos reservados.
   </footer>
 
 </body>
+
+
 
 </html>
 

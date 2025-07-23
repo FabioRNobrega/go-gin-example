@@ -87,7 +87,8 @@ func setupRouter() *gin.Engine {
 		router.LoadHTMLFiles("templates/template1.html", "templates/template2.html")
 	*/
 	r.LoadHTMLGlob("templates/*")
-	r.GET("/index", func(c *gin.Context) {
+	r.Static("/static/", "./static/")
+	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "base", gin.H{
 			"title": "Home",
 		})

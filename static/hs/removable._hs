@@ -1,0 +1,5 @@
+behavior Removable
+    on click
+      remove me
+    end
+  end
