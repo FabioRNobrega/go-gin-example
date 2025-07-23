@@ -18,6 +18,16 @@ func setupRouter() *gin.Engine {
 		c.String(http.StatusOK, "pong")
 	})
 
+	// Get some books
+	r.GET("/books", func(c *gin.Context) {
+		books := []map[string]interface{}{
+			{"id": 1, "title": "The Go Programming Language", "author": "Alan A. A. Donovan"},
+			{"id": 2, "title": "Introducing Go", "author": "Caleb Doxsey"},
+			{"id": 3, "title": "Go in Action", "author": "William Kennedy"},
+		}
+		c.JSON(http.StatusOK, gin.H{"books": books})
+	})
+
 	// Get user value
 	r.GET("/user/:name", func(c *gin.Context) {
 		user := c.Params.ByName("name")
