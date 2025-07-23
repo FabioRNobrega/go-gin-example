@@ -18,6 +18,11 @@ func setupRouter() *gin.Engine {
 		c.String(http.StatusOK, "pong")
 	})
 
+	// HealthCheck
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
 	// Get some books
 	r.GET("/books", func(c *gin.Context) {
 		books := []map[string]interface{}{
