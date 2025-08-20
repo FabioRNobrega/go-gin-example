@@ -13,7 +13,8 @@ We use:
 
   * [Install](#install)  
   * [Usage](#usage)  
-  * [Tests](#tests)  
+  * [Tests](#tests)
+  * [Architecture](#architecture)
   * [Troubleshooting](#troubleshooting)  
   * [Git Guideline](#git-guideline)  
 
@@ -60,6 +61,77 @@ make docker-down
 
 It's never too early to begin running unit tests. You can learn how to implement tests using Go's built-in testing framework on [Go Testing](https://pkg.go.dev/testing).
 
+## Architecture 
+
+1. C4 – Container Diagram adapted with flowchar to renden on github
+
+```mermaid
+flowchart TD
+    user([User<br/>Registers or borrows books])
+
+    subgraph System [Book Lending System]
+        webApp([Book Lending Web App<br/>Handles book registration and lending])
+        db[(Database<br/>Stores users and books information)]
+        webApp -->|Reads/Writes| db
+    end
+
+    user -->|Uses on browser| webApp
+
+
+```
+2. Sequence Diagram – Book Lending Flow
+
+```mermaid
+sequenceDiagram
+    participant A as User (Owner)
+    participant W as Web App
+    participant DB as Database
+    participant B as Friend (Borrower)
+
+    A->>W: Register book "The Hobbit"
+    W->>DB: Save book information
+    B->>W: Request to borrow book
+    W->>DB: Update book status to "Borrowed"
+    W->>A: Notify owner about the loan
+    W->>B: Confirm borrowing
+```
+
+4. Activity Diagram
+
+```mermaid
+flowchart TD
+    A[User registers book] --> B{Book already exists?}
+    B -- Yes --> C[Update book information]
+    B -- No --> D[Create new book record]
+    C --> E[Book available for lending]
+    D --> E
+    E --> F[Another user requests the book]
+    F --> G[Update status to Borrowed]
+    G --> H[Notify owner and borrower]
+```
+
+6. Class Diagram
+
+ ```mermaid
+classDiagram
+    class User {
+        +String name
+        +String email
+        +List<Book> books
+        +lendBook()
+        +requestBook()
+    }
+
+    class Book {
+        +String title
+        +String author
+        +String status
+        +User owner
+    }
+
+    User "1" -- "*" Book : owns
+    Book "1" -- "1" User : borrowed_by
+```
 
 
 ## Troubleshooting
