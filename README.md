@@ -1,145 +1,102 @@
-# Go Gin Example | Fábio R. Nóbrega
+# Go Gin Ping Pong | Fábio R. Nóbrega  
 
-This project is a simple example using [Gin Web Framework](https://github.com/gin-gonic/gin) in Go 1.23. The goal is to build a lightweight web API with hot reload support using Docker and `air`.
+This project is a simple **microservice playground** built with [Gin Web Framework](https://github.com/gin-gonic/gin) in Go 1.23.  
+The goal is to demonstrate how to structure multiple services (Ping, Pong, and Web UI) with **Docker Compose**, **htmx**, **Shoelace**, and **Air** (for hot reload).  
 
 We use:  
 - Go: 1.23  
 - Gin: v1.10.1  
 - Docker + Docker Compose  
-- Air for live reload
+- Air for live reload  
+- htmx + Shoelace for frontend  
+
+---
 
 ## Table of contents
-=================
 
-  * [Install](#install)  
-  * [Usage](#usage)  
-  * [Tests](#tests)
-  * [Architecture](#architecture)
-  * [Troubleshooting](#troubleshooting)  
-  * [Git Guideline](#git-guideline)  
+* [Install](#install)  
+* [Usage](#usage)  
+* [Architecture](#architecture)  
+* [Troubleshooting](#troubleshooting)  
+* [Git Guideline](#git-guideline)  
+
+---
 
 ## Install
 
-+ Clone the repo and cd into the project:
+Clone the repo and cd into the project:
 
 ```bash
 git clone https://github.com/FabioRNobrega/go-gin-example.git
 cd go-gin-example
 ```
 
-+ Make sure Docker and Docker Compose are installed.
+Make sure Docker and Docker Compose are installed.  
 
-+ Build and run the container with:
+Build and run the stack with:
 
 ```bash
 make docker-up
 ```
 
-This will start the app on port 8080 with hot reload enabled.
+This will start **3 services** with hot reload:  
+- **webservice** → UI + API Gateway (port 8080)  
+- **pingservice** → returns 🏓 "Hello World, I'm the ping service" (port 8081)  
+- **pongservice** → returns 🏓 "Hello World, I'm the pong service" (port 8082)  
 
-
-## Usage
-
-+ Access the API at:
-
-```
-http://localhost:8080/
-```
-
-+ Example endpoints:
-
-- `GET /ping` - returns a pong response  
-- `GET /user/:name` - returns a personalized greeting  
-
-+ To stop the container:
+Stop everything with:
 
 ```bash
 make docker-down
 ```
 
-## Tests
+---
 
-It's never too early to begin running unit tests. You can learn how to implement tests using Go's built-in testing framework on [Go Testing](https://pkg.go.dev/testing).
+## Usage
+
+Access the UI at:
+
+```
+http://localhost:8080/
+```
+
+On the screen you’ll see:
+- **Blue side** → Ping button  
+- **Green side** → Pong button  
+- A central ball 🏐 that moves left/right depending on which button you click.  
+- The ball displays the message returned by the microservice.  
+
+Example endpoints (if called directly):  
+- `GET http://localhost:8080/call-ping` → forwards request to `pingservice`  
+- `GET http://localhost:8080/call-pong` → forwards request to `pongservice`  
+
+---
 
 ## Architecture 
 
-1. C4 – Container Diagram adapted with flowchar to renden on github
+### Service Relationship Diagram  
 
 ```mermaid
-flowchart TD
-    user([User<br/>Registers or borrows books])
+flowchart LR
+    user([User<br/>Browser])
+    web([WebService<br/>UI + API Gateway])
+    ping([PingService<br/>🏓 Ping])
+    pong([PongService<br/>🏓 Pong])
 
-    subgraph System [Book Lending System]
-        webApp([Book Lending Web App<br/>Handles book registration and lending])
-        db[(Database<br/>Stores users and books information)]
-        webApp -->|Reads/Writes| db
-    end
-
-    user -->|Uses on browser| webApp
-
-
-```
-2. Sequence Diagram – Book Lending Flow
-
-```mermaid
-sequenceDiagram
-    participant A as User (Owner)
-    participant W as Web App
-    participant DB as Database
-    participant B as Friend (Borrower)
-
-    A->>W: Register book "The Hobbit"
-    W->>DB: Save book information
-    B->>W: Request to borrow book
-    W->>DB: Update book status to "Borrowed"
-    W->>A: Notify owner about the loan
-    W->>B: Confirm borrowing
+    user --> web
+    web --> ping
+    web --> pong
 ```
 
-4. Activity Diagram
-
-```mermaid
-flowchart TD
-    A[User registers book] --> B{Book already exists?}
-    B -- Yes --> C[Update book information]
-    B -- No --> D[Create new book record]
-    C --> E[Book available for lending]
-    D --> E
-    E --> F[Another user requests the book]
-    F --> G[Update status to Borrowed]
-    G --> H[Notify owner and borrower]
-```
-
-6. Class Diagram
-
- ```mermaid
-classDiagram
-    class User {
-        +String name
-        +String email
-        +List<Book> books
-        +lendBook()
-        +requestBook()
-    }
-
-    class Book {
-        +String title
-        +String author
-        +String status
-        +User owner
-    }
-
-    User "1" -- "*" Book : owns
-    Book "1" -- "1" User : borrowed_by
-```
-
+---
 
 ## Troubleshooting
 
-- If you cannot access the API via `localhost:8080`, verify that the Docker container is running and the port is correctly exposed in `docker-compose.yml`.
+- If you cannot access the UI via `localhost:8080`, verify that all containers are up with `docker ps`.  
+- Inside Docker, services resolve each other by **service name** (`pingservice:8081`, `pongservice:8082`).  
+- If hot reload fails, ensure `air` is installed and available in the container.  
 
-- For any permission issues with SSH, make sure your `~/.ssh` keys are correctly mounted into the container.
-
+---
 
 ## Git Guideline
 

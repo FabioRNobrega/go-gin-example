@@ -1,5 +1,0 @@
-behavior Uploader()
-    init 
-        add .uploader to me 
-        put 
-        `<sl-button> behavior button </sl-button>` at the start of me

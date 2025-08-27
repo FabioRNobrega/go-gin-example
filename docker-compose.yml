@@ -1,12 +1,35 @@
 version: '3.8'
 
 services:
-  golang-dev:
-    build: .
-    container_name: gin-framework-example
+  webservice:
+    build: ./webservice
+    container_name: webservice
     working_dir: /app
     ports:
       - "8080:8080"
     volumes:
-      - .:/app
+      - ./webservice:/app
     tty: true
+    command: air
+
+  pingservice:
+    build: ./pingservice
+    container_name: pingservice
+    working_dir: /app
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./pingservice:/app
+    tty: true
+    command: air
+
+  pongservice:
+    build: ./pongservice
+    container_name: pongservice
+    working_dir: /app
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./pongservice:/app
+    tty: true
+    command: air
