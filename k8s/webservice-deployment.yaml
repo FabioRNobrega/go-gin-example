@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webservice
+  namespace: pingpong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webservice
+  template:
+    metadata:
+      labels:
+        app: webservice
+    spec:
+      containers:
+      - name: webservice
+        image: <ACR_NAME>.azurecr.io/webservice:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webservice
+  namespace: pingpong
+spec:
+  selector:
+    app: webservice
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

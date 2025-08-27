@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingservice
+  namespace: pingpong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingservice
+  template:
+    metadata:
+      labels:
+        app: pingservice
+    spec:
+      containers:
+      - name: pingservice
+        image: <ACR_NAME>.azurecr.io/pingservice:latest
+        ports:
+        - containerPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pingservice
+  namespace: pingpong
+spec:
+  selector:
+    app: pingservice
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
