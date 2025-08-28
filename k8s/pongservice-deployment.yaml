@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: pongservice
-        image: <ACR_NAME>.azurecr.io/pongservice:latest
+        image: pingpongacr333.azurecr.io/pongservice:latest
         ports:
         - containerPort: 8082
 ---

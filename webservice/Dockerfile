@@ -1,9 +1,24 @@
-FROM golang:1.23
-
+# Stage 1: build
+FROM golang:1.23 AS builder
 WORKDIR /app
 
-# Ferramentas úteis + Air para hot reload
-RUN apt-get update && apt-get install -y git vim curl && \
-    go install github.com/cosmtrek/air@v1.52.0
+COPY go.mod go.sum ./
+RUN go mod download
 
-CMD ["air"]
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o app ./main.go
+
+# Stage 2: minimal run
+FROM scratch
+WORKDIR /app
+
+# Copy binary
+COPY --from=builder /app/app .
+
+# Copy required folders for frontend
+COPY static ./static
+COPY templates ./templates
+
+EXPOSE 8080
+CMD ["./app"]

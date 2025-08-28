@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: pingservice
-        image: <ACR_NAME>.azurecr.io/pingservice:latest
+        image: pingpongacr333.azurecr.io/pingservice:latest
         ports:
         - containerPort: 8081
 ---

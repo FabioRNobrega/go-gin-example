@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   webservice:
-    build: ./webservice
+    build:
+      context: ./webservice
+      dockerfile: Dockerfile.dev
     container_name: webservice
     working_dir: /app
     ports:
@@ -13,7 +15,9 @@ services:
     command: air
 
   pingservice:
-    build: ./pingservice
+    build:
+      context: ./pingservice
+      dockerfile: Dockerfile.dev
     container_name: pingservice
     working_dir: /app
     ports:
@@ -24,7 +28,9 @@ services:
     command: air
 
   pongservice:
-    build: ./pongservice
+    build:
+      context: ./pongservice
+      dockerfile: Dockerfile.dev
     container_name: pongservice
     working_dir: /app
     ports:
