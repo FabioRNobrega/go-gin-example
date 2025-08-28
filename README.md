@@ -19,6 +19,7 @@ We use:
 * [Architecture](#architecture)  
 * [Troubleshooting](#troubleshooting)  
 * [Git Guideline](#git-guideline)  
+* [AZURE Kubernetes with ACR](#azure-kubernetes-with-acr)
 
 ---
 
@@ -72,21 +73,60 @@ Example endpoints (if called directly):
 
 ---
 
-## Architecture 
+## Architecture
 
 ### Service Relationship Diagram  
 
 ```mermaid
 flowchart LR
-    user([User<br/>Browser])
-    web([WebService<br/>UI + API Gateway])
-    ping([PingService<br/>🏓 Ping])
-    pong([PongService<br/>🏓 Pong])
+    user([🌍 User<br/>Browser])
 
-    user --> web
-    web --> ping
-    web --> pong
+    subgraph Azure[Azure AKS Cluster]
+        subgraph NS[Namespace: pingpong]
+            ingress[Ingress Controller<br/>NGINX]
+            websvc[(Service: webservice<br/>ClusterIP:80→Pod:8080)]
+            pingsvc[(Service: pingservice<br/>ClusterIP:8081)]
+            pongsvc[(Service: pongservice<br/>ClusterIP:8082)]
+
+            web([Pod: WebService - GO APP])
+            ping([Pod: PingService - GO APP])
+            pong([Pod: PongService - GO APP])
+        end
+    end
+
+    acr[(Azure Container Registry<br/>pingpongacr333)]
+
+    %% Connections
+    user --> ingress --> websvc --> web
+    web --> pingsvc --> ping
+    web --> pongsvc --> pong
+    acr --> Azure
 ```
+
++ Ingress: Entry point that exposes the application to the internet with a stable external IP.
+
++ Service: Provides a stable network endpoint inside the cluster, forwarding traffic to the right Pods.
+
++ Pod: The actual running instance of your application (container with your Go app).
+
+### Flow:
+
+```mermaid
+
+flowchart LR
+    user([User<br/>Browser])
+    ingress([Ingress<br/>Public Entry Point])
+    websvc([WebService Service])
+    webpod([WebService Pod<br/>UI + API Gateway])
+    pingsvc([PingService Service])
+    pingpod([PingService Pod])
+    pongsvc([PongService Service])
+    pongpod([PongService Pod])
+
+    user --> ingress --> websvc --> webpod
+    webpod --> pingsvc --> pingpod
+    webpod --> pongsvc --> pongpod
+``` 
 
 ---
 
@@ -114,3 +154,10 @@ Create your branches and commits using English and follow this guideline:
 - Refactor: `refactor(context): message`  
 - Tests: `tests(context): message`  
 - Docs: `docs(context): message`  
+
+## AZURE Kubernetes with ACR
+
+We have prepared detailed documentation to guide you:  
+
+- [Deployment Guide](./001-DEPLOYMENT_AZURE_GUIDE.md) – Step-by-step instructions on how to deploy Kubernetes on Azure with ACR.  
+- [Maintenance Guide](./002-MAINTENANCE_GUIDE.md) – How to access the cluster, manage namespaces, view logs, and scale your services.  
