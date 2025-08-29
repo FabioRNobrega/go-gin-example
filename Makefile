@@ -28,8 +28,12 @@ kubectl-apply: create-namespace
 aks-connect:
 	az aks get-credentials --resource-group $(RESOURCE_GROUP) --name $(CLUSTER_NAME)
 
-# Full deploy: build + push + apply
-deploy: docker-build-push kubectl-apply
+# Full deploy: build + push + apply + rollout
+deploy: docker-build-push kubectl-apply rollout-restart
+
+# Restart all deployments in the namespace
+rollout-restart:
+	kubectl rollout restart deployment -n $(NAMESPACE)
 
 # Clean up namespace
 clean:
