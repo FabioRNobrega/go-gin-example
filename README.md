@@ -161,3 +161,5 @@ We have prepared detailed documentation to guide you:
 
 - [Deployment Guide](./001-DEPLOYMENT_AZURE_GUIDE.md) – Step-by-step instructions on how to deploy Kubernetes on Azure with ACR.  
 - [Maintenance Guide](./002-MAINTENANCE_GUIDE.md) – How to access the cluster, manage namespaces, view logs, and scale your services.  
+- [Nodes Explanation](./003-NODES.md)  - Understanding how nodes and nodes pools works on ASK.
+- [AKS Key Vault Setup](./004-AKS_KEYVAULT_SETUP.md) - How to implement secret with AKS Key Vault on K8S.
