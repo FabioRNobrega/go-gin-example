@@ -1,0 +1,65 @@
+{{ define "footer/base"}}
+<footer class="footer-container">
+  <sl-icon-button id="footer-toggle" class="footer-toggle" name="chevron-double-up"
+    _="on click if #footer.classList.contains('collapsed')
+          remove .collapsed from #footer
+          set #footer-toggle.name to 'chevron-double-down'
+        else
+          add .collapsed to #footer
+          set #footer-toggle.name to 'chevron-double-up'
+        end">
+  </sl-icon-button>
+
+  <div id="footer" class="footer collapsed">
+    <div class="footer-buttons">
+      <sl-button variant="success" href="/">🏓 Ping Pong</sl-button>
+      <sl-button variant="primary" href="/encrypt-decrypt">🔐 Encrypt / Decrypt</sl-button>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .footer {
+    width: 100%;
+    background: var(--sl-color-neutral-50);
+    border-top: 1px solid var(--sl-color-neutral-200);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    height: 80px;
+    transition: height 0.3s ease-in-out;
+  }
+
+  .footer.collapsed {
+    height: 0; 
+  }
+
+  .footer-buttons {
+    display: flex;
+    gap: 1rem;
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .footer.collapsed .footer-buttons {
+    opacity: 0;
+  }
+
+  .footer-toggle {
+    position: absolute;
+    top: -2rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    background: var(--sl-color-neutral-50);
+    padding: 0.25rem;
+  }
+</style>
+{{ end }}

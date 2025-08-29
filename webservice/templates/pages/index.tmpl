@@ -1,0 +1,98 @@
+{{ define "base"}}
+<!DOCTYPE html>
+<html id="html" class="sl-theme-dark">
+  {{ template "base/head" .}}
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    .table-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .side {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      font-size: 1.2rem;
+      position: relative;
+    }
+
+    .left {
+      background: var(--sl-color-cyan-600);
+      border: 10px solid white;
+    }
+
+    .right {
+      background: var(--sl-color-lime-600);
+      border: 10px solid white;
+    }
+
+    .ball {
+      position: absolute;
+      bottom: 15%; /* fica abaixo dos botões */
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffffff 0%, #cccccc 30%, #999999 70%, #666666 100%);
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: all 0.8s ease;
+      box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3),
+                  inset 5px 5px 15px rgba(255,255,255,0.6),
+                  0 10px 20px rgba(0,0,0,0.4);
+      text-align: center;
+      padding: 10px;
+    }
+
+    .left-pos {
+      left: 20%;
+    }
+
+    .right-pos {
+      left: 70%;
+    }
+  </style>
+
+<body>
+  <div class="table-container">
+    <div class="side left">
+      <sl-button variant="primary"
+        hx-get="/call-ping"
+        hx-target="#ball"
+        hx-swap="innerHTML"
+        _="on htmx:afterRequest add .left-pos to #ball then remove .right-pos from #ball">
+        🏓 Ping
+      </sl-button>
+    </div>
+
+    <div class="side right">
+      <sl-button variant="success"
+        hx-get="/call-pong"
+        hx-target="#ball"
+        hx-swap="innerHTML"
+        _="on htmx:afterRequest add .right-pos to #ball then remove .left-pos from #ball">
+        🏓 Pong
+      </sl-button>
+    </div>
+
+    <div id="ball" class="ball left-pos">
+      🏓 Ready
+    </div>
+  </div>
+</body>
+
+{{ template "footer/base"}}
+
+</html>
+{{ end }}

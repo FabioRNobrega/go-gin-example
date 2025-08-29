@@ -1,0 +1,86 @@
+{{ define "encrypt-decrypt/base"}}
+<!DOCTYPE html>
+<html id="html" class="sl-theme-dark">
+{{ template "base/head" .}}
+<style>
+    body {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
+      background-color: var(--sl-color-cyan-600)
+    }
+
+  .page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+  }
+  .crypto-card {
+    width: 500px;
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: var(--sl-shadow-large);
+    background: var(--sl-color-gray-50);
+  }
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .result-box {
+    margin-top: 1.5rem;
+    font-family: monospace;
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--sl-color-neutral-100);
+    word-wrap: break-word;
+    text-align: left;
+  }
+</style>
+
+<body>
+  <div class="page-container">
+    <sl-card class="crypto-card">
+      <h1>{{ .title }}</h1>
+
+      <sl-input id="crypto-input" name="text" label="Enter your text" placeholder="Write something here..."></sl-input>
+
+
+      <div class="button-group">
+        <sl-button 
+          variant="primary"
+          hx-post="/encrypt"
+          hx-include="#crypto-input"
+          hx-target="#crypto-result"
+          hx-swap="innerHTML"
+          hx-on::after-request="document.querySelector('#crypto-input').value = document.querySelector('#crypto-result').innerText">
+          🔐 Encrypt
+        </sl-button>
+
+        <sl-button 
+          variant="success"
+          hx-post="/decrypt"
+          hx-include="#crypto-input"
+          hx-target="#crypto-result"
+          hx-swap="innerHTML">
+          🔓 Decrypt
+        </sl-button>
+      </div>
+
+      <div id="crypto-result" class="result-box">
+        <em>The result will appear here...</em>
+      </div>
+    </sl-card>
+  </div>
+</body>
+
+{{ template "footer/base"}}
+
+</html>
+{{ end }}

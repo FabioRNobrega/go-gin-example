@@ -13,7 +13,8 @@ services:
       - ./webservice:/app
     tty: true
     command: air
-
+    env_file:
+      - ./webservice/.env
   pingservice:
     build:
       context: ./pingservice
@@ -39,3 +40,5 @@ services:
       - ./pongservice:/app
     tty: true
     command: air
+    env_file:
+      - ./pongservice/.env
