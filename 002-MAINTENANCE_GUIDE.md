@@ -9,6 +9,10 @@ It covers accessing the cluster, working with the `pingpong` namespace, monitori
 
 First, connect your local `kubectl` to the Azure Kubernetes Service (AKS) cluster:
 
+```bash 
+az acr login --name pingpongacr333
+```
+
 ```bash
 az aks get-credentials --resource-group ping-pong-resource-group --name ping-pong-cluster-name
 

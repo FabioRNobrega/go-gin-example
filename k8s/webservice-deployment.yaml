@@ -18,3 +18,20 @@ spec:
         image: pingpongacr333.azurecr.io/webservice:latest
         ports:
         - containerPort: 8080
+        env:
+        - name: RSA_PUBLIC_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pingpong-keys-secret
+              key: rsa-public-key
+        volumeMounts:
+        - name: secrets-store-inline
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      volumes:
+      - name: secrets-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: pingpong-keys

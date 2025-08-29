@@ -9,16 +9,19 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o app ./main.go
 
-# Stage 2: minimal run
+# Stage 2: minimal runtime
 FROM scratch
 WORKDIR /app
 
 # Copy binary
 COPY --from=builder /app/app .
 
-# Copy required folders for frontend
+# Copy static assets for frontend
 COPY static ./static
 COPY templates ./templates
+
+# The app expects RSA_PUBLIC_KEY as env injected by Kubernetes
+ENV RSA_PUBLIC_KEY=""
 
 EXPOSE 8080
 CMD ["./app"]
