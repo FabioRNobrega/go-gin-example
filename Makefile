@@ -40,7 +40,7 @@ clean:
 	kubectl delete namespace $(NAMESPACE) --ignore-not-found=true
 
 # Local development
-docker-up:
+docker-run:
 	docker-compose up --build
 
 docker-down:

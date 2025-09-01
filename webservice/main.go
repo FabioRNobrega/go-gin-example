@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -15,7 +16,39 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 )
+
+type SessionTheme struct {
+	SessionID string `json:"session_id"`
+	DarkMode  bool   `json:"dark_mode"`
+}
+
+var ctx = context.Background()
+
+func newRedisClient() *redis.Client {
+	host := os.Getenv("REDIS_HOST")
+	port := os.Getenv("REDIS_PORT")
+	if host == "" {
+		host = "localhost"
+	}
+	if port == "" {
+		port = "6379"
+	}
+
+	rdb := redis.NewClient(&redis.Options{
+		Addr: fmt.Sprintf("%s:%s", host, port),
+		DB:   0,
+	})
+
+	if _, err := rdb.Ping(ctx).Result(); err != nil {
+		panic(fmt.Sprintf("error connecting to Redis: %v", err))
+	}
+
+	fmt.Println("connected to Redis in", host, port)
+	return rdb
+}
 
 func loadPublicKey() *rsa.PublicKey {
 	pubKeyPEM := os.Getenv("RSA_PUBLIC_KEY")
@@ -37,22 +70,31 @@ func loadPublicKey() *rsa.PublicKey {
 
 func main() {
 	pubKey := loadPublicKey()
+	redisDb := newRedisClient()
 
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/**/*.tmpl")
 	r.Static("/static/", "./static/")
 
 	r.GET("/", func(c *gin.Context) {
+		sessionID := uuid.New().String()
 		c.HTML(http.StatusOK, "base", gin.H{
-			"title": "Ping Pong",
+			"title":      "Ping Pong",
+			"session_id": sessionID,
+			"dark_mode":  true,
 		})
 	})
 
 	r.GET("/encrypt-decrypt", func(c *gin.Context) {
+		sessionID := uuid.New().String()
 		c.HTML(http.StatusOK, "encrypt-decrypt/base", gin.H{
-			"title": "Encrypt & Decrypt",
+			"title":      "Encrypt & Decrypt",
+			"session_id": sessionID,
+			"dark_mode":  true,
 		})
 	})
+
+	// Connection with different services
 
 	r.GET("/call-ping", func(c *gin.Context) {
 		resp, err := http.Get("http://pingservice:8081/ping")
@@ -75,6 +117,8 @@ func main() {
 		body, _ := io.ReadAll(resp.Body)
 		c.String(http.StatusOK, string(body))
 	})
+
+	// Using keys for decrypt and encrypt
 
 	r.POST("/encrypt", func(c *gin.Context) {
 		text := c.PostForm("text")
@@ -116,6 +160,44 @@ func main() {
 		}
 
 		c.String(http.StatusOK, pongResp.DecryptedText)
+	})
+
+	// Redis
+	r.PUT("/theme", func(c *gin.Context) {
+		ctx := c.Request.Context()
+
+		sessionID := c.PostForm("session_id")
+		if sessionID == "" {
+			sessionID = uuid.New().String()
+		}
+
+		darkMode := c.PostForm("darkMode") == "on"
+
+		var session SessionTheme
+		val, err := redisDb.Get(ctx, "session:"+sessionID).Result()
+		if err == redis.Nil {
+			session = SessionTheme{SessionID: sessionID, DarkMode: darkMode}
+		} else if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "redis error"})
+			return
+		} else {
+			if err := json.Unmarshal([]byte(val), &session); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "parse error"})
+				return
+			}
+			session.DarkMode = darkMode
+		}
+
+		data, _ := json.Marshal(session)
+		if err := redisDb.Set(ctx, "session:"+sessionID, data, 0).Err(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save theme"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"session_id": session.SessionID,
+			"dark_mode":  session.DarkMode,
+		})
 	})
 
 	r.Run(":8080")

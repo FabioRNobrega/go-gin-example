@@ -15,6 +15,12 @@ services:
     command: air
     env_file:
       - ./webservice/.env
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
   pingservice:
     build:
       context: ./pingservice
@@ -42,3 +48,14 @@ services:
     command: air
     env_file:
       - ./pongservice/.env
+
+  redis:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
