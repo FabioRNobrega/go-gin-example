@@ -24,6 +24,10 @@ spec:
             secretKeyRef:
               name: pingpong-keys-secret
               key: rsa-public-key
+        - name: REDIS_HOST
+          value: "redis-pingpong-cache"
+        - name: REDIS_PORT
+          value: "6379"
         volumeMounts:
         - name: secrets-store-inline
           mountPath: "/mnt/secrets-store"

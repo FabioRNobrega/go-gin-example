@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-pingpong-cache
+  namespace: pingpong
+  labels:
+    app: redis-pingpong-cache
+spec:
+  serviceName: "redis-pingpong-cache"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-pingpong-cache
+  template:
+    metadata:
+      labels:
+        app: redis-pingpong-cache
+    spec:
+      containers:
+      - name: redis
+        image: pingpongacr333.azurecr.io/redis:latest
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        command: ["redis-server", "--save", "60", "1", "--appendonly", "yes"]
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: managed-csi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-pingpong-cache
+  namespace: pingpong
+spec:
+  clusterIP: None
+  selector:
+    app: redis-pingpong-cache
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379

@@ -6,9 +6,9 @@
   hx-trigger="load"
   hx-vals='js:{
     "session_id": (localStorage.getItem("session_id") || (function(){
-      let uuid = window.crypto.randomUUID();
-      localStorage.setItem("session_id", uuid);
-      return uuid;
+      let id = Math.random().toString(36).substring(2, 12);
+      localStorage.setItem("session_id", id);
+      return id;
     })())
   }'
   hx-swap="none"
