@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -77,20 +76,14 @@ func main() {
 	r.Static("/static/", "./static/")
 
 	r.GET("/", func(c *gin.Context) {
-		sessionID := uuid.New().String()
 		c.HTML(http.StatusOK, "base", gin.H{
-			"title":      "Ping Pong",
-			"session_id": sessionID,
-			"dark_mode":  true,
+			"title": "Ping Pong",
 		})
 	})
 
 	r.GET("/encrypt-decrypt", func(c *gin.Context) {
-		sessionID := uuid.New().String()
 		c.HTML(http.StatusOK, "encrypt-decrypt/base", gin.H{
-			"title":      "Encrypt & Decrypt",
-			"session_id": sessionID,
-			"dark_mode":  true,
+			"title": "Encrypt & Decrypt",
 		})
 	})
 
@@ -165,39 +158,50 @@ func main() {
 	// Redis
 	r.PUT("/theme", func(c *gin.Context) {
 		ctx := c.Request.Context()
-
 		sessionID := c.PostForm("session_id")
-		if sessionID == "" {
-			sessionID = uuid.New().String()
-		}
-
-		darkMode := c.PostForm("darkMode") == "on"
-
+		darkModeParam := c.PostForm("darkMode") == "on"
 		var session SessionTheme
 		val, err := redisDb.Get(ctx, "session:"+sessionID).Result()
-		if err == redis.Nil {
-			session = SessionTheme{SessionID: sessionID, DarkMode: darkMode}
-		} else if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "redis error"})
+		if err != nil {
+			session = SessionTheme{SessionID: sessionID, DarkMode: true}
+		} else if unmarshalErr := json.Unmarshal([]byte(val), &session); unmarshalErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "parse error"})
 			return
-		} else {
-			if err := json.Unmarshal([]byte(val), &session); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "parse error"})
-				return
-			}
-			session.DarkMode = darkMode
 		}
-
+		session.DarkMode = darkModeParam
 		data, _ := json.Marshal(session)
 		if err := redisDb.Set(ctx, "session:"+sessionID, data, 0).Err(); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save theme"})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"session_id": session.SessionID,
-			"dark_mode":  session.DarkMode,
-		})
+		c.JSON(http.StatusOK, session)
+	})
+
+	r.GET("/theme", func(c *gin.Context) {
+		ctx := c.Request.Context()
+		sessionID := c.Query("session_id")
+		if sessionID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "session_id is required"})
+			return
+		}
+
+		var session SessionTheme
+		val, err := redisDb.Get(ctx, "session:"+sessionID).Result()
+		if err != nil {
+			session = SessionTheme{SessionID: sessionID, DarkMode: true}
+		} else if unmarshalErr := json.Unmarshal([]byte(val), &session); unmarshalErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "parse error"})
+			return
+		}
+
+		data, _ := json.Marshal(session)
+		if setErr := redisDb.Set(ctx, "session:"+sessionID, data, 0).Err(); setErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save theme"})
+			return
+		}
+
+		c.JSON(http.StatusOK, session)
 	})
 
 	r.Run(":8080")

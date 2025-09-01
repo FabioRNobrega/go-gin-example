@@ -1,0 +1,103 @@
+{{ define "theme-selector/base"}}
+<div 
+  id="session-init"
+  hidden
+  hx-get="/theme"
+  hx-trigger="load"
+  hx-vals='js:{
+    "session_id": (localStorage.getItem("session_id") || (function(){
+      let uuid = window.crypto.randomUUID();
+      localStorage.setItem("session_id", uuid);
+      return uuid;
+    })())
+  }'
+  hx-swap="none"
+  _="on htmx:afterOnLoad
+        set result to JSON.parse(event.detail.xhr.responseText)
+        set sessionId to result.session_id
+        set darkMode to result.dark_mode
+
+        call localStorage.setItem('session_id', sessionId)
+
+        remove .sl-theme-dark .sl-theme-light from <html/>
+        if darkMode
+            add .sl-theme-dark to <html/>
+            add .active to #moon-icon
+            remove .active from #sun-icon
+            js document.querySelector('#theme-switch').checked = true end
+        else
+            add .sl-theme-light to <html/>
+            add .active to #sun-icon
+            remove .active from #moon-icon
+            js document.querySelector('#theme-switch').checked = false end
+        end
+  "
+></div>
+
+
+
+<div class="theme-container">
+  <sl-icon id="sun-icon" name="sun-fill" class="theme-icon"></sl-icon>
+
+  <form 
+    id="settings-form"
+    hx-put="/theme"
+    hx-trigger="sl-change from:sl-switch"
+    hx-vals='js:{"session_id": localStorage.getItem("session_id")}'
+    hx-swap="none"
+  >
+    <sl-switch
+      id="theme-switch"
+      name="darkMode"
+      form="settings-form"
+      _="on 'sl-change'
+          remove .sl-theme-dark .sl-theme-light from <html/>
+          if my.checked
+              add .sl-theme-dark to <html/>
+              add .active to #moon-icon
+              remove .active from #sun-icon
+          else
+              add .sl-theme-light to <html/>
+              add .active to #sun-icon
+              remove .active from #moon-icon
+          end"
+    >
+    </sl-switch>
+  </form>
+
+  <sl-icon id="moon-icon" name="moon-fill" class="theme-icon"></sl-icon>
+</div>
+
+<style>
+  .theme-container {
+      position: fixed;
+      top: 0;
+      right: 1rem;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      background: var(--sl-color-neutral-50);
+      border: 1px solid var(--sl-color-neutral-200);
+      border-radius: 0 0 var(--sl-border-radius-medium) var(--sl-border-radius-medium);
+      padding: 0.5rem 1rem;
+      width: fit-content;
+      margin: 0 auto;
+  }
+
+  .theme-icon {
+    font-size: 1.5rem;
+    color: var(--sl-color-neutral-500);
+    transition: color 0.2s ease-in-out;
+  }
+
+  #sun-icon.active {
+    color: var(--sl-color-orange-500);
+  }
+
+  #moon-icon.active {
+    color: var(--sl-color-gray-950);
+  }
+</style>
+{{ end }}
