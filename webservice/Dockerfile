@@ -20,8 +20,5 @@ COPY --from=builder /app/app .
 COPY static ./static
 COPY templates ./templates
 
-# The app expects RSA_PUBLIC_KEY as env injected by Kubernetes
-ENV RSA_PUBLIC_KEY=""
-
 EXPOSE 8080
 CMD ["./app"]

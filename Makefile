@@ -21,8 +21,8 @@ create-namespace:
 	-kubectl create namespace $(NAMESPACE)
 
 # Apply Kubernetes manifests
-kubectl-apply: create-namespace
-	kubectl apply -f k8s/ -n $(NAMESPACE)
+kubectl-apply: 
+	-kubectl apply -f k8s/ -n $(NAMESPACE)
 
 # Connect kubectl to AKS cluster
 aks-connect:

@@ -127,6 +127,12 @@ Check pod logs:
 kubectl logs -n pingpong <webservice-pod>
 ```
 
+Open secrets on bash
+
+```bash
+KUBE_EDITOR=nano kubectl edit secret pingpong-keys-secret -n pingpong
+```
+
 ---
 
 ✅ Now your application receives the keys from Azure Key Vault via **env vars** injected by the **CSI Driver**.

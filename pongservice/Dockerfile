@@ -19,8 +19,6 @@ WORKDIR /app
 # Copy only the binary
 COPY --from=builder /app/app .
 
-# The app expects RSA_PRIVATE_KEY as env injected by Kubernetes
-ENV RSA_PRIVATE_KEY=""
 
 EXPOSE 8082
 CMD ["./app"]
